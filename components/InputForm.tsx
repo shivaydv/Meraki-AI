@@ -16,6 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { Alert } from "./ui/alert";
+import { toast } from "./ui/use-toast";
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -43,6 +44,7 @@ export function InputFrom() {
       prompt,
     });
     setData(JSON.stringify(res.data));
+    toast({title:"Message",description:"Sample Test Success"})
   }
 
   return (
@@ -86,7 +88,7 @@ export function InputFrom() {
           )}
         />
         <Button type="submit">Generate</Button>
-        <p>{Data}</p>
+        
       </form>
     </Form>
   );

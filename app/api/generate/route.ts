@@ -12,13 +12,13 @@ export async function POST(req: Request, res: Response) {
     // const {name,prompt} = await req.json()
     await connect();
     // const test = await Post.create({name:"shiva",prompt:"images prompt",image:"random"})
-    const response = await openai.images.generate({
-      model: "dall-e-3",
-      prompt: "a white siamese cat",
-      n: 1,
-      size: "1024x1024",
-      response_format: "url",
-    });
+    // const response = await openai.images.generate({
+    //   model: "dall-e-3",
+    //   prompt: "a white siamese cat",
+    //   n: 1,
+    //   size: "1024x1024",
+    //   response_format: "url",
+    // });
 
     // console.log(response.data)
     return NextResponse.json("response");
