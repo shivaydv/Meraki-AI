@@ -15,7 +15,7 @@ const PhotoGallery = () => {
 
   const getPost = async () => {
     try {
-      const res = axios.get(`${process.env.SERVER_URL}/api/all-post`);
+      const res = axios.get(`/api/all-post`);
       setData((await res).data);
     } catch (error) {
       console.log(error);
