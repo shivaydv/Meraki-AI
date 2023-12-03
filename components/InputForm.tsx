@@ -51,7 +51,7 @@ export function InputFrom() {
       setSharing(true)
       const { name, prompt } = form.getValues();
      
-      const res = await axios.post("http://localhost:3000/api/share", {
+      const res = await axios.post(`${process.env.SERVER_URL}/api/share`, {
         name,
         prompt,
         image:ImageUrl,
@@ -75,7 +75,7 @@ export function InputFrom() {
     try {
       setLoading(true);
       const { name, prompt } = values;
-      const res = await axios.post("http://localhost:3000/api/generate", {
+      const res = await axios.post(`${process.env.SERVER_URL}/api/generate`, {
         name,
         prompt,
       });
