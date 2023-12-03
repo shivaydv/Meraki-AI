@@ -98,7 +98,7 @@ export function InputFrom() {
 
   return (
     <Form {...form}>
-      <div className="flex justify-around items-center flex-col lg:flex-row max-lg:gap-4">
+      <div className="flex justify-between items-center flex-col lg:flex-row max-lg:gap-4 max-lg:px-2">
         <form
           onSubmit={form.handleSubmit(onSubmit)}
           className="space-y-4 max-w-md w-full   "
@@ -153,7 +153,7 @@ export function InputFrom() {
             )}
           </div>
         </form>
-        <div className="w-[350px]">
+        <div className=" w-full lg:w-[350px]">
           <AspectRatio ratio={1 / 1}>
             {ImageUrl ? (
               <Image
