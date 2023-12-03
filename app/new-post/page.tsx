@@ -5,7 +5,7 @@ import { Separator } from "@/components/ui/separator";
 
 const page = () => {
   return (
-    <main className="w-full">
+    <main className="w-full mb-6">
       <h1 className="font-extrabold text-2xl md:text-4xl pt-2">
         Generate Your AI Image
       </h1>

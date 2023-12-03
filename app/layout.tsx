@@ -20,7 +20,7 @@ export default function RootLayout({
       <body className={cn("bg-primary-foreground", GeistSans.className)}>
         <main className=" flex flex-col min-h-screen ">
           <Navbar />
-          <div className="flex-1 flex max-w-7xl mx-auto w-full px-2.5 md:px-0 pt-2.5">
+          <div className="flex-1 flex max-w-7xl mx-auto w-full px-2.5 xl:px-0 pt-2.5">
             {children}
           </div>
         </main>

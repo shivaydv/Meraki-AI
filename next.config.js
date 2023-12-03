@@ -1,8 +1,20 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    images:{
-        domains:['images.unsplash.com'],
-    }
+    images: {
+        remotePatterns: [
+          {
+            protocol: 'https',
+            hostname: 'images.unsplash.com',
+            pathname: '**',
+          },
+          {
+            protocol: 'http',
+            hostname: 'res.cloudinary.com',
+            port:'',
+            pathname: '/dvkau07l1/image/upload/**',
+          },
+        ],
+      },
 }
 
 module.exports = nextConfig

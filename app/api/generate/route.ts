@@ -1,5 +1,3 @@
-import connect from "@/lib/db";
-import Post from "@/models/models";
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 
@@ -10,8 +8,6 @@ const openai = new OpenAI({
 export async function POST(req: Request, res: Response) {
   try {
     // const {name,prompt} = await req.json()
-    await connect();
-    // const test = await Post.create({name:"shiva",prompt:"images prompt",image:"random"})
     // const response = await openai.images.generate({
     //   model: "dall-e-3",
     //   prompt: "a white siamese cat",
@@ -21,7 +17,9 @@ export async function POST(req: Request, res: Response) {
     // });
 
     // console.log(response.data)
-    return NextResponse.json("response");
+    
+
+    return NextResponse.json("https://images.unsplash.com/photo-1701220291853-99945bcc23d5?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");
   } catch (error) {
     console.log(error);
     return NextResponse.json(error);
