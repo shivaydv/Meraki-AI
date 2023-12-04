@@ -15,17 +15,17 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
-import { Alert } from "./ui/alert";
+
 import { toast } from "./ui/use-toast";
 import Image from "next/image";
 import { AspectRatio } from "./ui/aspect-ratio";
 import { Skeleton } from "./ui/skeleton";
-import { ImageIcon, Upload } from "lucide-react";
-import {  cn, getBase64, getRandomPrompt } from "@/lib/utils";
+import { ImageIcon } from "lucide-react";
+import {  cn, getRandomPrompt } from "@/lib/utils";
 import Loader from "./Loader";
-import Link from "next/link";
+
 import FileSaver from "file-saver";
-import { redirect } from "next/navigation";
+
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -94,6 +94,7 @@ export function InputFrom() {
       });
       
       setImageUrl(res.data);    
+      
     } catch (error) {
       toast({
         title: "Error",
@@ -112,6 +113,7 @@ export function InputFrom() {
   return (
     <Form {...form}>
       <div className="flex justify-between items-center flex-col lg:flex-row max-lg:gap-4 max-lg:px-2">
+        
         <form
           onSubmit={form.handleSubmit(onSubmit)}
           className="space-y-4 max-w-md w-full   "
@@ -159,7 +161,7 @@ export function InputFrom() {
             >
               {Loading?<Loader/>:"Generate"}
             </Button>
-            {ImageUrl && (<>
+            {ImageUrl && Loading==false && (<>
               <Button type="button"  className="w-full border-2" onClick={()=>downloadImage(ImageUrl)}>Download</Button>
               {Uploaded ? <Button type="button" className="w-full" disabled={true }>
                Already Shared
@@ -172,6 +174,7 @@ export function InputFrom() {
           </div>
         </form>
         <div className=" w-full lg:w-[450px]">
+          
           <AspectRatio ratio={1 / 1}>
             {ImageUrl ? (
               <Image
@@ -180,7 +183,7 @@ export function InputFrom() {
                 onLoad={()=>setLoading(false)}
                 fill
                 className={cn("rounded-lg object-cover aspect-square bg-primary/30 border-primary shadow-lg",Loading&&"animate-pulse")}
-                alt="test image"
+                alt="AI Generated Image"
               />   
             ) : (
               <div className="w-full h-full flex justify-center items-center bg-muted border-2 rounded-lg flex-col gap-2 ">
