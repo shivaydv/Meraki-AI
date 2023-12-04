@@ -1,3 +1,4 @@
+import axios from "axios";
 import { NextRequest, NextResponse } from "next/server";
 // import OpenAI from "openai";
 
@@ -16,9 +17,17 @@ export async function POST(req: Request, res: Response) {
     //   response_format: "url",
     // });
 
+    const orientation =["landscape","portrait","squarish"]
+      const randomSize = Math.floor(Math.random() * orientation.length)
+      const unsplash =await axios.get("https://api.unsplash.com/photos/random",{params:{
+        client_id:process.env.UNSPLASH_ACCESS_KEY,
+        count:1,
+        orientation:orientation[randomSize]
+      }})
+      const imageUrl =unsplash.data[0].urls.regular;
     
 
-    return NextResponse.json("https://images.unsplash.com/photo-1701220291853-99945bcc23d5?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");
+    return NextResponse.json(imageUrl);
   } catch (error) {
     console.log(error);
     return NextResponse.json(error);

@@ -92,18 +92,8 @@ export function InputFrom() {
         name,
         prompt,
       });
-
-      const orientation =["landscape","portrait","squarish"]
-      const randomSize = Math.floor(Math.random() * orientation.length)
-      const unsplash =await axios.get("https://api.unsplash.com/photos/random",{params:{
-        client_id:process.env.NEXT_PUBLIC_UNSPLASH_ACCESS_KEY,
-        count:1,
-        orientation:orientation[randomSize]
-      }})
-      const imageUrl =unsplash.data[0].urls.regular;
-      const base64 = await getBase64(imageUrl)
-
-      setImageUrl(imageUrl);    
+      
+      setImageUrl(res.data);    
     } catch (error) {
       toast({
         title: "Error",
