@@ -27,12 +27,12 @@ const PhotoGallery = () => {
 
   const copyPrompt = (prompt: string) => {
     navigator.clipboard.writeText(prompt);
-    toast({ title: "Message", description: "Prompt Text Copied Successfully" });
+    toast({ title: "Message", description: "Prompt Text Copied Successfully",className:"" });
   };
 
   const downloadImage = (image: string, prompt: string) => {
     FileSaver.saveAs(image, prompt);
-    toast({ title: "Message", description: "Downloading Started" });
+    toast({ title: "Message", description: "Downloading Started" ,className:""});
   };
 
   useEffect(() => {
@@ -55,6 +55,7 @@ const PhotoGallery = () => {
                 src={item.image}
                 width={500}
                 height={500}
+                loading="lazy"
                 alt={item.prompt}
                 className="rounded-md z-10 object-contain"
               />

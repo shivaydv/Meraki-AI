@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/toaster";
+import { ThemeProvider } from "@/components/theme-provider";
 
 export const metadata: Metadata = {
   title: "AI Image Generation",
@@ -20,7 +21,14 @@ export default function RootLayout({
       <head>
       <link rel="icon" href="/favicon.ico" sizes="any" />
       </head>
-      <body className={cn("bg-primary-foreground", GeistSans.className)}>
+      <body className={cn("", GeistSans.className)}>
+      <ThemeProvider
+            attribute="class"
+            defaultTheme="light"
+            enableSystem
+            // disableTransitionOnChange
+          >
+
         <main className=" flex flex-col min-h-screen ">
           <Navbar />
           <div className="flex-1 flex max-w-7xl mx-auto w-full px-2.5 xl:px-0 pt-2.5">
@@ -28,6 +36,7 @@ export default function RootLayout({
           </div>
         </main>
         <Toaster />
+          </ThemeProvider>
       </body>
     </html>
   );
