@@ -101,7 +101,8 @@ export function InputFrom() {
         description: "Something went Wrong",
         variant: "destructive",
       });
-      setLoading(false);
+    }finally{
+      setLoading(false)
     }
   }
 
@@ -180,7 +181,7 @@ export function InputFrom() {
               <Image
                 src={`${ImageUrl}`}
                 loading="lazy"
-                onLoad={()=>setLoading(false)}
+               
                 fill
                 className={cn("rounded-lg object-cover aspect-square bg-primary/30 border-primary shadow-lg",Loading&&"animate-pulse")}
                 alt="AI Generated Image"
