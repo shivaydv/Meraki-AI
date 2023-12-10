@@ -6,7 +6,6 @@ export async function GET() {
   try {
     await connect();
     const posts = await Post.find();
-
     return NextResponse.json(posts);
   } catch (error) {
     console.log(error);

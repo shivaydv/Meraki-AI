@@ -1,6 +1,7 @@
 import PhotoGallery from "@/components/PhotoGallery";
 import { Separator } from "@/components/ui/separator";
 
+
 export default function Home() {
   return (
     <div className="w-full pt-4  ">
@@ -16,3 +17,5 @@ export default function Home() {
     </div>
   );
 }
+
+

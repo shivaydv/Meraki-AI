@@ -15,7 +15,7 @@ const PhotoGallery = () => {
 
   const getPost = async () => {
     try {
-      const res = axios.get(`/api/all-post`);
+      const res =axios.get(`/api/all-post?timestamp=${Date.now()}`);
       setData((await res).data);
     } catch (error) {
       console.log(error);
@@ -38,6 +38,8 @@ const PhotoGallery = () => {
   useEffect(() => {
     getPost();
   }, []);
+
+
   return (
     <div >
       {Loading ? (
@@ -92,5 +94,7 @@ const PhotoGallery = () => {
     </div>
   );
 };
+
+
 
 export default PhotoGallery;
