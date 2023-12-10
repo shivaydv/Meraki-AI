@@ -60,11 +60,19 @@ export function InputFrom() {
         prompt,
         image:ImageUrl,
       });
-      toast({
-        title: "Message",
-        description: "Shared Successfully!",className:""
-      });
-      setUploaded(true) 
+      if(res.data.status ==200){
+        toast({
+          title: "Message",
+          description: "Shared Successfully!",className:""
+        });
+        setUploaded(true) 
+      } else{
+        toast({
+          title: "Error",
+          description: "Can't Share in Community",
+          variant: "destructive",
+        });
+      }
     } catch (error) {
       toast({
         title: "Error",

@@ -22,8 +22,7 @@ export async function POST(req: Request, res: Response) {
       prompt,
       image: photoUrl.url,
     });
-
-    return NextResponse.json(photoUrl);
+    return NextResponse.json({status:200});
   } catch (error) {
     return NextResponse.json({ error: error });
   }
