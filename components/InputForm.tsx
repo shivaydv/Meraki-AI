@@ -55,7 +55,6 @@ export function InputFrom() {
     try {
       setSharing(true)
       const { name, prompt } = form.getValues();
-     
       const res = await axios.post(`/api/share`, {
         name,
         prompt,
@@ -77,9 +76,14 @@ export function InputFrom() {
     }
   }
   const downloadImage = (image: string) => {
-    const {prompt } = form.getValues();
+    try {
+      const {prompt } = form.getValues();
     FileSaver.saveAs(image, prompt);
     toast({ title: "Message", description: "Downloading Started",className:"" });
+    } catch (error) {
+      toast({ title: "Error", description: "Download Failed",variant:"destructive" });
+    }
+    
   };
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
