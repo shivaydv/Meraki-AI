@@ -9,7 +9,7 @@ import { toast } from "./ui/use-toast";
 import { Download } from "lucide-react";
 
 const PhotoGallery = () => {
-  const [Data, setData] = useState<any>();
+  const [Data, setData] = useState<any[]>([]);
   const [Error, setError] = useState<boolean>(false);
   const [Loading, setLoading] = useState<boolean>(true);
 
@@ -46,7 +46,7 @@ const PhotoGallery = () => {
         </div>
       ) : (
         <div className="lg:columns-3 columns-1  sm:columns-2 md:columns-3 sm:gap-3 space-y-3 pb-10  ">
-          {Data?.slice(0).reverse().map((item: any) => (
+          {Array.isArray(Data) && Data.slice(0).reverse().map((item: any) => (
             <div
               key={item._id}
               className="relative break-inside-avoid w-full h-full group flex justify-center"
