@@ -15,7 +15,7 @@ const PhotoGallery = () => {
 
   const getPost = async () => {
     try {
-      const res =axios.get(`/api/all-post?timestamp=${Date.now()}`);
+      const res =axios.get(`/api/all-post`);
       setData((await res).data);
     } catch (error) {
       console.log(error);
@@ -47,7 +47,7 @@ const PhotoGallery = () => {
           <Loader />
         </div>
       ) : (
-        <div className="lg:columns-3 columns-1  sm:columns-2 md:columns-3 sm:gap-3 space-y-3 pb-10  ">
+        <div className=" sm:columns-2 md:columns-3 columns-1  sm:gap-3 space-y-3 pb-10  ">
           {Array.isArray(Data) && Data.slice(0).reverse().map((item: any) => (
             <div
               key={item._id}
