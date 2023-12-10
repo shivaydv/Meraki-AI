@@ -21,11 +21,10 @@ import Image from "next/image";
 import { AspectRatio } from "./ui/aspect-ratio";
 import { Skeleton } from "./ui/skeleton";
 import { ImageIcon } from "lucide-react";
-import {  cn, getRandomPrompt } from "@/lib/utils";
+import { cn, getRandomPrompt } from "@/lib/utils";
 import Loader from "./Loader";
 
 import FileSaver from "file-saver";
-
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -37,8 +36,7 @@ const formSchema = z.object({
 });
 
 export function InputFrom() {
-  const [ImageUrl, setImageUrl] = useState<string|undefined>(undefined);
-  
+  const [ImageUrl, setImageUrl] = useState<string | undefined>(undefined);
   const [Loading, setLoading] = useState<boolean>(false);
   const [Sharing, setSharing] = useState<boolean>(false);
   const [Uploaded, setUploaded] = useState<boolean>(false);
@@ -53,20 +51,21 @@ export function InputFrom() {
 
   async function uploadImage() {
     try {
-      setSharing(true)
+      setSharing(true);
       const { name, prompt } = form.getValues();
       const res = await axios.post(`/api/share`, {
         name,
         prompt,
-        image:ImageUrl,
+        image: ImageUrl,
       });
-      if(res.data.status ==200){
+      if (res.data.status == 200) {
         toast({
           title: "Message",
-          description: "Shared Successfully!",className:""
+          description: "Shared Successfully!",
+          className: "",
         });
-        setUploaded(true) 
-      } else{
+        setUploaded(true);
+      } else {
         toast({
           title: "Error",
           description: "Can't Share in Community",
@@ -79,42 +78,49 @@ export function InputFrom() {
         description: "Something went Wrong",
         variant: "destructive",
       });
-    }finally{
-      setSharing(false)
+    } finally {
+      setSharing(false);
     }
   }
+
   const downloadImage = (image: string) => {
-    try {
-      const {prompt } = form.getValues();
-    FileSaver.saveAs(image, prompt);
-    toast({ title: "Message", description: "Downloading Started",className:"" });
-    } catch (error) {
-      toast({ title: "Error", description: "Download Failed",variant:"destructive" });
+    if (ImageUrl) {
+      const { prompt } = form.getValues();
+      FileSaver.saveAs(image, prompt);
+      toast({
+        title: "Message",
+        description: "Downloading Started",
+        className: "",
+      });
+    } else {
+      toast({
+        title: "Error",
+        description: "Download Failed",
+        variant: "destructive",
+      });
     }
-    
   };
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       setLoading(true);
-      setImageUrl(undefined)
-      setUploaded(false)
+      setImageUrl(undefined);
+      setUploaded(false);
       const { name, prompt } = values;
       const res = await axios.post(`/api/generate`, {
         name,
         prompt,
       });
-      
-      setImageUrl(res.data);    
-      
+
+      setImageUrl(res.data);
     } catch (error) {
       toast({
         title: "Error",
         description: "Something went Wrong",
         variant: "destructive",
       });
-    }finally{
-      setLoading(false)
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -126,7 +132,6 @@ export function InputFrom() {
   return (
     <Form {...form}>
       <div className="flex justify-between items-center flex-col lg:flex-row max-lg:gap-4 max-lg:px-2">
-        
         <form
           onSubmit={form.handleSubmit(onSubmit)}
           className="space-y-4 max-w-md w-full   "
@@ -172,43 +177,58 @@ export function InputFrom() {
               className="w-full "
               disabled={Loading ? true : false}
             >
-              {Loading?<Loader/>:"Generate"}
+              {Loading ? <Loader /> : "Generate"}
             </Button>
-            {ImageUrl && Loading==false && (<>
-              <Button type="button"  className="w-full border-2" onClick={()=>downloadImage(ImageUrl)}>Download</Button>
-              {Uploaded ? <Button type="button" className="w-full" disabled={true }>
-               Already Shared
-              </Button>:<Button type="button" className="w-full" onClick={uploadImage} disabled={Sharing ? true : false}>
-                {Sharing?<Loader/>:"Share with Community"}
-              </Button>
-              }
+            {ImageUrl && Loading == false && (
+              <>
+                <Button
+                  type="button"
+                  className="w-full border-2"
+                  onClick={() => downloadImage(ImageUrl)}
+                >
+                  Download
+                </Button>
+                {Uploaded ? (
+                  <Button type="button" className="w-full" disabled={true}>
+                    Already Shared
+                  </Button>
+                ) : (
+                  <Button
+                    type="button"
+                    className="w-full"
+                    onClick={uploadImage}
+                    disabled={Sharing ? true : false}
+                  >
+                    {Sharing ? <Loader /> : "Share with Community"}
+                  </Button>
+                )}
               </>
             )}
           </div>
         </form>
         <div className=" w-full lg:w-[450px]">
-          
           <AspectRatio ratio={1 / 1}>
             {ImageUrl ? (
               <Image
                 src={`${ImageUrl}`}
                 loading="lazy"
-               
                 fill
-                className={cn("rounded-lg object-cover aspect-square bg-primary/30 border-primary shadow-lg",Loading&&"animate-pulse")}
+                className={cn(
+                  "rounded-lg object-cover aspect-square bg-primary/30 border-primary shadow-lg",
+                  Loading && "animate-pulse"
+                )}
                 alt="AI Generated Image"
-              />   
+              />
             ) : (
               <div className="w-full h-full flex justify-center items-center bg-muted border-2 rounded-lg flex-col gap-2 ">
                 {Loading ? (
                   <Skeleton className="w-full bg-primary/30 h-full border-2" />
                 ) : (
                   <ImageIcon size={50} />
-                )}               
+                )}
               </div>
             )}
           </AspectRatio>
-          
         </div>
       </div>
     </Form>
