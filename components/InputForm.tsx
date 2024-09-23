@@ -13,6 +13,15 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 
@@ -25,11 +34,10 @@ import { cn, getRandomPrompt } from "@/lib/utils";
 import Loader from "./Loader";
 
 import FileSaver from "file-saver";
+import { Label } from "./ui/label";
+import { AutosizeTextarea } from "./ui/textarea";
 
 const formSchema = z.object({
-  name: z.string().min(2, {
-    message: "Username must be at least 2 characters.",
-  }),
   prompt: z
     .string()
     .min(4, { message: "Prompt must be at least 4 characters" }),
@@ -40,21 +48,23 @@ export function InputFrom() {
   const [Loading, setLoading] = useState<boolean>(false);
   const [Sharing, setSharing] = useState<boolean>(false);
   const [Uploaded, setUploaded] = useState<boolean>(false);
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: "",
-      prompt: "",
-    },
+  const [promptData, setpromptData] = useState({
+    prompt: "",
+    model: "Normal",
+    size: "1:1",
   });
+
+  const handleChange = (e: any) => {
+    const { name, value } = e.target;
+    setpromptData({ ...promptData, [name]: value });
+    console.log(promptData);
+  };
 
   async function uploadImage() {
     try {
       setSharing(true);
-      const { name, prompt } = form.getValues();
+      const { prompt } = promptData;
       const res = await axios.post(`/api/share`, {
-        name,
         prompt,
         image: ImageUrl,
       });
@@ -85,7 +95,7 @@ export function InputFrom() {
 
   const downloadImage = (image: string) => {
     if (ImageUrl) {
-      const { prompt } = form.getValues();
+      const { prompt } = promptData;
       FileSaver.saveAs(image, prompt);
       toast({
         title: "Message",
@@ -101,111 +111,129 @@ export function InputFrom() {
     }
   };
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    try {
-      setLoading(true);
-      setImageUrl(undefined);
-      setUploaded(false);
-      const { name, prompt } = values;
-      const res = await axios.post(`/api/generate`, {
-        name,
-        prompt,
-      });
+  async function handleSubmit(e: any) {
+    e.preventDefault();
+    console.log(promptData);
+    // try {
+    //   setLoading(true);
+    //   setImageUrl(undefined);
+    //   setUploaded(false);
 
-      setImageUrl(res.data);
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Something went Wrong",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
+    //   const res = await axios.post(`/api/generate`, {
+    //     prompt,
+    //   });
+
+    //   setImageUrl(res.data);
+    // } catch (error) {
+    //   toast({
+    //     title: "Error",
+    //     description: "Something went Wrong",
+    //     variant: "destructive",
+    //   });
+    // } finally {
+    //   setLoading(false);
+    // }
+    setpromptData({ ...promptData, prompt: "" });
   }
 
   const surpriseMe = () => {
     const promptString = getRandomPrompt();
-    form.setValue("prompt", promptString);
+    setpromptData({ ...promptData, prompt: promptString });
+    // console.log(promptData);
   };
 
   return (
-    <Form {...form}>
-      <div className="flex justify-between items-center flex-col lg:flex-row max-lg:gap-4 max-lg:px-2">
+    <div>
+      <div className="flex justify-between items-center flex-col lg:flex-row max-md:gap-4 max-md:px-2 md:px-10">
         <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-4 max-w-md w-full   "
+          onSubmit={handleSubmit}
+          className="space-y-4 max-w-md w-full flex flex-col  justify-center items-center gap-4"
         >
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="Name" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="prompt"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Give a detailed description of Image</FormLabel>
-                <Button
-                  type="button"
-                  className="ml-4"
-                  size={"sm"}
-                  variant="outline"
-                  onClick={surpriseMe}
+          <div className="space-y-2 w-full">
+            <div className="flex gap-4 flex-wrap">
+              <div>
+                <Label htmlFor="name">Model</Label>
+
+                <Select
+                  required
+                  value={promptData.model}
+                  name="model"
+                  onValueChange={(e) =>
+                    setpromptData({ ...promptData, model: e })
+                  }
                 >
-                  Surprise me
-                </Button>
-                <FormControl>
-                  <Input placeholder="Enter Your Prompt here..." {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <div className=" space-y-4 pt-4">
-            <Button
-              type="submit"
-              className="w-full "
-              disabled={Loading ? true : false}
-            >
-              {Loading ? <Loader /> : "Generate"}
-            </Button>
-            {ImageUrl && Loading == false && (
-              <>
-                <Button
-                  type="button"
-                  className="w-full border-2"
-                  onClick={() => downloadImage(ImageUrl)}
+                  <SelectTrigger className="w-[180px] ">
+                    <SelectValue placeholder="Select Model" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Model</SelectLabel>
+                      <SelectItem value="3D">3D</SelectItem>
+                      <SelectItem value="Anime">Anime</SelectItem>
+                      <SelectItem value="Realistic">Realistic</SelectItem>
+                      <SelectItem value="Normal">Normal</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="name">Size</Label>
+
+                <Select
+                  required
+                  value={promptData.size}
+                  name="model"
+                  onValueChange={(e) =>
+                    setpromptData({ ...promptData, size: e })
+                  }
                 >
-                  Download
-                </Button>
-                {Uploaded ? (
-                  <Button type="button" className="w-full" disabled={true}>
-                    Already Shared
-                  </Button>
-                ) : (
-                  <Button
-                    type="button"
-                    className="w-full"
-                    onClick={uploadImage}
-                    disabled={Sharing ? true : false}
-                  >
-                    {Sharing ? <Loader /> : "Share with Community"}
-                  </Button>
-                )}
-              </>
-            )}
+                  <SelectTrigger className="w-[180px] ">
+                    <SelectValue placeholder="Select Size" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Model</SelectLabel>
+                      <SelectItem value="16:9">16:9</SelectItem>
+                      <SelectItem value="1:1">1:1</SelectItem>
+                      <SelectItem value="9:16">9:16</SelectItem>
+                      <SelectItem value="4:3">4:3</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="flex gap-2  items-center">
+              <Label htmlFor="name">Prompt</Label>
+              {/* <Button
+            type="button"
+            size={"sm"}
+            variant={"ghost"}
+            onClick={surpriseMe}
+            className="w-fit"
+          >
+            Get Random Prompt{" "}
+          </Button> */}
+            </div>
+            <AutosizeTextarea
+              id="prompt"
+              placeholder="Enter Your Prompt here..."
+              name="prompt"
+              value={promptData.prompt}
+              onChange={handleChange}
+              required
+              className="resize-none w-full"
+              maxHeight={200}
+              autoComplete="off"
+            />
           </div>
+
+          <Button type="submit" className="w-fit" disabled={Loading}>
+            {Loading ? <Loader /> : "Generate"}
+          </Button>
         </form>
+
         <div className=" w-full lg:w-[450px]">
           <AspectRatio ratio={1 / 1}>
             {ImageUrl ? (
@@ -231,7 +259,7 @@ export function InputFrom() {
           </AspectRatio>
         </div>
       </div>
-    </Form>
+    </div>
   );
 }
 export default InputFrom;

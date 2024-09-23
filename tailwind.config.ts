@@ -50,6 +50,10 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        filter: {
+          "blur-20": "blur(20px)",
+          "blur-25": "blur(25px)",
+           },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -61,14 +65,32 @@ module.exports = {
           from: { height: 0 },
           to: { height: "var(--radix-accordion-content-height)" },
         },
+        "pop-blob": {
+          "0%": { transform: "scale(1)" },
+          "33%": { transform: "scale(1.2)" },
+          "66%": { transform: "scale(0.8)" },
+          "100%": { transform: "scale(1)" },
+        },
         "accordion-up": {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: 0 },
+        },
+        "gradient": {
+          to: {
+            backgroundPosition: "var(--bg-size) 0",
+          },
+        },
+        "border-beam": {
+          "100%": {
+            "offset-distance": "100%",
+          },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "gradient": "gradient 8s linear infinite",
+        "border-beam": "border-beam calc(var(--duration)*1s) infinite linear",
       },
     },
   },

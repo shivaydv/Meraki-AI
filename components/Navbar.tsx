@@ -1,14 +1,21 @@
+"use client"
 import Link from "next/link";
 import Navigation from "./Navigation";
+import { motion } from "framer-motion";
 
 const Navbar = () => {
   return (
-    <header className="w-full z-[12] bg-background h-16  flex justify-between items-center px-4  border-b-2 sticky top-0  ">
+    <motion.header
+    initial={{ opacity: 0, y: -30,filter: "blur(10px)" }}
+    animate={{ opacity: 1, y: 0 , filter: "blur(0px)"}}
+    transition={{ duration: 0.5,delay:1 }}
+     className="w-full z-[12] container bg-background h-16  flex justify-between items-center px-4 sticky top-0  ">
+
       <Link href="/">
-        <h1 className="text-xl font-bold ">AI Image Gen</h1>
+        <h1 className="text-xl font-bold">Meraki AI</h1>
       </Link>
       <Navigation />
-    </header>
+    </motion.header>
   );
 };
 
