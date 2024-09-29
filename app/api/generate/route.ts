@@ -23,7 +23,7 @@ export async function POST(req: Request, res: Response) {
       "Landscape": { width: 1920, height: 1080 },
     };
 
-    const selectedSize = sizeMap[size];
+    const selectedSize = sizeMap["Square"];
 
     const { width, height } = selectedSize;
 
