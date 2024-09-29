@@ -1,18 +1,7 @@
 "use client";
 import axios from "axios";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
-
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { z } from "zod";
 import {
   Select,
   SelectContent,
@@ -29,13 +18,12 @@ import { toast } from "./ui/use-toast";
 import Image from "next/image";
 import { AspectRatio } from "./ui/aspect-ratio";
 import { Skeleton } from "./ui/skeleton";
-import { ImageIcon } from "lucide-react";
-import { cn, getRandomPrompt } from "@/lib/utils";
+
+import { getRandomPrompt } from "@/lib/utils";
 import Loader from "./Loader";
 
 import FileSaver from "file-saver";
 import { Label } from "./ui/label";
-import { AutosizeTextarea } from "./ui/textarea";
 
 const formSchema = z.object({
   prompt: z
@@ -44,20 +32,19 @@ const formSchema = z.object({
 });
 
 export function InputFrom() {
-  const [ImageUrl, setImageUrl] = useState<string | undefined>(undefined);
+  const [imageUrl, setImageUrl] = useState<string | undefined>(undefined);
   const [Loading, setLoading] = useState<boolean>(false);
   const [Sharing, setSharing] = useState<boolean>(false);
   const [Uploaded, setUploaded] = useState<boolean>(false);
   const [promptData, setpromptData] = useState({
     prompt: "",
-    model: "Normal",
-    size: "1:1",
+    model: "flux",
+    size: "Square",
   });
 
   const handleChange = (e: any) => {
     const { name, value } = e.target;
     setpromptData({ ...promptData, [name]: value });
-    console.log(promptData);
   };
 
   async function uploadImage() {
@@ -66,13 +53,13 @@ export function InputFrom() {
       const { prompt } = promptData;
       const res = await axios.post(`/api/share`, {
         prompt,
-        image: ImageUrl,
+        image: imageUrl,
       });
       if (res.data.status == 200) {
         toast({
           title: "Message",
           description: "Shared Successfully!",
-          className: "",
+          className: "bg-green-600 text-white",
         });
         setUploaded(true);
       } else {
@@ -94,13 +81,13 @@ export function InputFrom() {
   }
 
   const downloadImage = (image: string) => {
-    if (ImageUrl) {
+    if (imageUrl) {
       const { prompt } = promptData;
       FileSaver.saveAs(image, prompt);
       toast({
         title: "Message",
         description: "Downloading Started",
-        className: "",
+        className: "bg-green-600 text-white",
       });
     } else {
       toast({
@@ -113,46 +100,44 @@ export function InputFrom() {
 
   async function handleSubmit(e: any) {
     e.preventDefault();
-    console.log(promptData);
-    // try {
-    //   setLoading(true);
-    //   setImageUrl(undefined);
-    //   setUploaded(false);
 
-    //   const res = await axios.post(`/api/generate`, {
-    //     prompt,
-    //   });
-
-    //   setImageUrl(res.data);
-    // } catch (error) {
-    //   toast({
-    //     title: "Error",
-    //     description: "Something went Wrong",
-    //     variant: "destructive",
-    //   });
-    // } finally {
-    //   setLoading(false);
-    // }
-    setpromptData({ ...promptData, prompt: "" });
+    try {
+      setLoading(true);
+      setImageUrl(undefined);
+      setUploaded(false);
+      const res = await axios.post(`/api/generate`, {
+        promptData,
+      });
+      setImageUrl(res.data.imageUrl);
+      // setpromptData({ ...promptData, prompt: "" });
+    } catch (error) {
+      console.log(error);
+      toast({
+        title: "Error",
+        description: "Something went Wrong",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   }
 
   const surpriseMe = () => {
     const promptString = getRandomPrompt();
     setpromptData({ ...promptData, prompt: promptString });
-    // console.log(promptData);
   };
 
   return (
     <div>
-      <div className="flex justify-between items-center flex-col lg:flex-row max-md:gap-4 max-md:px-2 md:px-10">
+      <div className="flex justify-between sm:items-center md:px-10 gap-10 flex-col lg:flex-row   max-h-screen">
         <form
           onSubmit={handleSubmit}
-          className="space-y-4 max-w-md w-full flex flex-col  justify-center items-center gap-4"
+          className="space-y-4 max-w-md w-full flex flex-col justify-center gap-4"
         >
           <div className="space-y-2 w-full">
-            <div className="flex gap-4 flex-wrap">
-              <div>
-                <Label htmlFor="name">Model</Label>
+            <div className="flex gap-4 flex-wrap w-full ">
+              <div className="space-y-2">
+                <Label  htmlFor="name">Model</Label>
 
                 <Select
                   required
@@ -162,28 +147,31 @@ export function InputFrom() {
                     setpromptData({ ...promptData, model: e })
                   }
                 >
-                  <SelectTrigger className="w-[180px] ">
+                  <SelectTrigger className="w-[180px]">
                     <SelectValue placeholder="Select Model" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
                       <SelectLabel>Model</SelectLabel>
-                      <SelectItem value="3D">3D</SelectItem>
-                      <SelectItem value="Anime">Anime</SelectItem>
-                      <SelectItem value="Realistic">Realistic</SelectItem>
-                      <SelectItem value="Normal">Normal</SelectItem>
+                      <SelectItem value="flux">Normal</SelectItem>
+                      <SelectItem value="flux-3d">3D</SelectItem>
+                      <SelectItem value="flux-anime">Anime</SelectItem>
+                      <SelectItem value="flux-realism">Realistic</SelectItem>
+                      <SelectItem value="any-dark">Dark</SelectItem>
+                      <SelectItem value="turbo">Turbo</SelectItem>
                     </SelectGroup>
                   </SelectContent>
                 </Select>
               </div>
 
-              <div>
-                <Label htmlFor="name">Size</Label>
+              <div className="space-y-2">
+                <Label  htmlFor="name">Size</Label>
 
                 <Select
                   required
                   value={promptData.size}
                   name="model"
+                  disabled
                   onValueChange={(e) =>
                     setpromptData({ ...promptData, size: e })
                   }
@@ -194,65 +182,79 @@ export function InputFrom() {
                   <SelectContent>
                     <SelectGroup>
                       <SelectLabel>Model</SelectLabel>
-                      <SelectItem value="16:9">16:9</SelectItem>
-                      <SelectItem value="1:1">1:1</SelectItem>
-                      <SelectItem value="9:16">9:16</SelectItem>
-                      <SelectItem value="4:3">4:3</SelectItem>
+
+                      <SelectItem value="Square">Square 1:1</SelectItem>
+                      <SelectItem value="Vertical">Vertical 9:16</SelectItem>
+                      <SelectItem value="Landscape">Landscape 16: 9</SelectItem>
                     </SelectGroup>
                   </SelectContent>
                 </Select>
               </div>
             </div>
 
-            <div className="flex gap-2  items-center">
+            <div className="space-y-2">
               <Label htmlFor="name">Prompt</Label>
-              {/* <Button
-            type="button"
-            size={"sm"}
-            variant={"ghost"}
-            onClick={surpriseMe}
-            className="w-fit"
-          >
-            Get Random Prompt{" "}
-          </Button> */}
+
+              <Input
+                id="prompt"
+                placeholder="Enter Your Prompt here..."
+                name="prompt"
+                value={promptData.prompt}
+                onChange={handleChange}
+                required
+                className="resize-none w-full"
+                autoComplete="off"
+              />
             </div>
-            <AutosizeTextarea
-              id="prompt"
-              placeholder="Enter Your Prompt here..."
-              name="prompt"
-              value={promptData.prompt}
-              onChange={handleChange}
-              required
-              className="resize-none w-full"
-              maxHeight={200}
-              autoComplete="off"
-            />
           </div>
 
-          <Button type="submit" className="w-fit" disabled={Loading}>
-            {Loading ? <Loader /> : "Generate"}
+<div className="flex flex-col gap-2">
+
+          <Button type="submit" className="w-" disabled={Loading}>
+            {Loading ? <> <Loader /><p className="pl-2"> Generating</p> </>   : "Generate"}
           </Button>
+{
+  imageUrl && (
+    <div className="flex gap-2 ">
+    <Button
+      onClick={() => downloadImage(imageUrl)}
+      className="w-full"
+      type="button"
+    >
+      Download
+    </Button>
+    <Button
+      onClick={uploadImage}
+      className="w-full"
+      type="button"
+      disabled={Sharing || Uploaded}
+    >
+      {Sharing ? <> <Loader /><p className="pl-2"> Sharing</p> </>   : "Share in Community"}
+    </Button>
+  </div>
+  )
+}
+</div>
         </form>
 
-        <div className=" w-full lg:w-[450px]">
+        <div className="w-5/6 sm:w-[450px] md:w-[450px]  flex justify-center">
           <AspectRatio ratio={1 / 1}>
-            {ImageUrl ? (
+            {imageUrl ? (
               <Image
-                src={`${ImageUrl}`}
+                src={`${imageUrl}`}
                 loading="lazy"
                 fill
-                className={cn(
-                  "rounded-lg object-cover aspect-square bg-primary/30 border-primary shadow-lg",
-                  Loading && "animate-pulse"
-                )}
+                className={`rounded-lg object-cover  shadow-lg w-full h-full`}
                 alt="AI Generated Image"
               />
             ) : (
-              <div className="w-full h-full flex justify-center items-center bg-muted border-2 rounded-lg flex-col gap-2 ">
+              <div className="w-full h-full flex justify-center items-center bg-primary-foreground border-2 rounded-lg flex-col gap-2 ">
                 {Loading ? (
-                  <Skeleton className="w-full bg-primary/30 h-full border-2" />
+                  <Skeleton className="w-full bg-primary/10 h-full border-2" ><Loader/></Skeleton>
                 ) : (
-                  <ImageIcon size={50} />
+
+                    <p className="text-gray-500">No Image Generated Yet</p>
+
                 )}
               </div>
             )}
