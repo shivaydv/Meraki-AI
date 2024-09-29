@@ -237,7 +237,7 @@ export function InputFrom() {
 </div>
         </form>
 
-        <div className="w-5/6 sm:w-[450px] md:w-[450px]  flex justify-center">
+        <div className="w-full max-sm:max-w-md sm:w-[450px] md:w-[450px]  flex justify-center">
           <AspectRatio ratio={1 / 1}>
             {imageUrl ? (
               <Image

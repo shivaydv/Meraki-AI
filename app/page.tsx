@@ -1,7 +1,6 @@
 "use client";
 import Hero from "@/components/Hero";
 import BorderBeam from "@/components/ui/BorderBeam";
-import { ContainerScroll } from "@/components/ui/ContainerScroll";
 import { motion } from "framer-motion";
 import Image from "next/image";
 
@@ -20,7 +19,7 @@ export default function Home() {
           className=" aspect-video shadow-2xl relative lg:h-[520px]  overflow-hidden rounded-2xl  bg-primary dark:bg-muted md:rounded-2xl p-2 "
         >
           <Image
-            src={`/test.png`}
+            src={`/hero-img.jpg`}
             alt="hero"
             height={720}
             width={1400}
