@@ -31,7 +31,7 @@ const formSchema = z.object({
     .min(4, { message: "Prompt must be at least 4 characters" }),
 });
 
-export function InputFrom() {
+export function InputForm() {
   const [imageUrl, setImageUrl] = useState<string | undefined>(undefined);
   const [Loading, setLoading] = useState<boolean>(false);
   const [Sharing, setSharing] = useState<boolean>(false);
@@ -127,18 +127,30 @@ export function InputFrom() {
     setpromptData({ ...promptData, prompt: promptString });
   };
 
+  // Add this function to determine the aspect ratio
+  const getAspectRatio = (size: string) => {
+    switch (size) {
+      case "Vertical":
+        return 9 / 16;
+      case "Landscape":
+        return 16 / 9;
+      default:
+        return 1;
+    }
+  };
+
+
   return (
-    <div>
-      <div className="flex justify-between sm:items-center md:px-10 gap-10 flex-col lg:flex-row   max-h-screen">
+    <div className="w-full max-w-7xl mx-auto">
+      <div className="flex flex-col md:flex-row gap-8 ">
         <form
           onSubmit={handleSubmit}
-          className="space-y-4 max-w-md w-full flex flex-col justify-center gap-4"
+          className="space-y-6 w-full md:w-1/2 "
         >
-          <div className="space-y-2 w-full">
-            <div className="flex gap-4 flex-wrap w-full ">
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label  htmlFor="name">Model</Label>
-
+                <Label htmlFor="model">Model</Label>
                 <Select
                   required
                   value={promptData.model}
@@ -147,7 +159,7 @@ export function InputFrom() {
                     setpromptData({ ...promptData, model: e })
                   }
                 >
-                  <SelectTrigger className="w-[180px]">
+                  <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select Model" />
                   </SelectTrigger>
                   <SelectContent>
@@ -165,24 +177,21 @@ export function InputFrom() {
               </div>
 
               <div className="space-y-2">
-                <Label  htmlFor="name">Size</Label>
-
+                <Label htmlFor="size">Size</Label>
                 <Select
                   required
                   value={promptData.size}
-                  name="model"
-                  disabled
+                  name="size"
                   onValueChange={(e) =>
                     setpromptData({ ...promptData, size: e })
                   }
                 >
-                  <SelectTrigger className="w-[180px] ">
+                  <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select Size" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
                       <SelectLabel>Model</SelectLabel>
-
                       <SelectItem value="Square">Square 1:1</SelectItem>
                       <SelectItem value="Vertical">Vertical 9:16</SelectItem>
                       <SelectItem value="Landscape">Landscape 16: 9</SelectItem>
@@ -193,8 +202,7 @@ export function InputFrom() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="name">Prompt</Label>
-
+              <Label htmlFor="prompt">Prompt</Label>
               <Input
                 id="prompt"
                 placeholder="Enter Your Prompt here..."
@@ -208,53 +216,75 @@ export function InputFrom() {
             </div>
           </div>
 
-<div className="flex flex-col gap-2">
-
-          <Button type="submit" className="w-" disabled={Loading}>
-            {Loading ? <> <Loader /><p className="pl-2"> Generating</p> </>   : "Generate"}
-          </Button>
-{
-  imageUrl && (
-    <div className="flex gap-2 ">
-    <Button
-      onClick={() => downloadImage(imageUrl)}
-      className="w-full"
-      type="button"
-    >
-      Download
-    </Button>
-    <Button
-      onClick={uploadImage}
-      className="w-full"
-      type="button"
-      disabled={Sharing || Uploaded}
-    >
-      {Sharing ? <> <Loader /><p className="pl-2"> Sharing</p> </>   : "Share in Community"}
-    </Button>
-  </div>
-  )
-}
-</div>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <Button type="submit" className="w-full" disabled={Loading}>
+                {Loading ? (
+                  <>
+                    <Loader />
+                    <p className="pl-2">Generating</p>
+                  </>
+                ) : (
+                  "Generate"
+                )}
+              </Button>
+              <Button
+                onClick={surpriseMe}
+                type="button"
+                variant="outline"
+                className="w-full"
+              >
+                Surprise Me
+              </Button>
+            </div>
+            {imageUrl && (
+              <div className="grid grid-cols-2 gap-4">
+                <Button
+                  onClick={() => downloadImage(imageUrl)}
+                  className="w-full"
+                  type="button"
+                >
+                  Download
+                </Button>
+                <Button
+                  onClick={uploadImage}
+                  className="w-full"
+                  type="button"
+                  disabled={Sharing || Uploaded}
+                >
+                  {Sharing ? (
+                    <>
+                      <Loader />
+                      <p className="pl-2">Sharing</p>
+                    </>
+                  ) : (
+                    "Share in Community"
+                  )}
+                </Button>
+              </div>
+            )}
+          </div>
         </form>
 
-        <div className="w-full max-sm:max-w-md sm:w-[450px] md:w-[450px]  flex justify-center">
-          <AspectRatio ratio={1 / 1}>
+
+        <div className={`w-full mx-auto md:w-1/2  ${promptData.size == "Vertical"? "max-w-sm":"max-w-md" }`}>
+          <AspectRatio ratio={getAspectRatio(promptData.size)}>
             {imageUrl ? (
               <Image
                 src={`${imageUrl}`}
                 loading="lazy"
                 fill
-                className={`rounded-lg object-cover  shadow-lg w-full h-full`}
+                className="rounded-lg object-cover shadow-lg"
                 alt="AI Generated Image"
               />
             ) : (
-              <div className="w-full h-full flex justify-center items-center bg-primary-foreground border-2 rounded-lg flex-col gap-2 ">
+              <div className="w-full h-full flex justify-center items-center bg-primary-foreground border-2 rounded-lg flex-col gap-2">
                 {Loading ? (
-                  <Skeleton className="w-full bg-primary/10 h-full border-2" ><Loader/></Skeleton>
+                  <Skeleton className="w-full h-full bg-primary/10 border-2">
+                    <Loader />
+                  </Skeleton>
                 ) : (
-
-                    <p className="text-gray-500">No Image Generated Yet</p>
-
+                  <p className="text-gray-500">No Image is Generated Yet</p>
                 )}
               </div>
             )}
@@ -264,4 +294,5 @@ export function InputFrom() {
     </div>
   );
 }
-export default InputFrom;
+
+export default InputForm;

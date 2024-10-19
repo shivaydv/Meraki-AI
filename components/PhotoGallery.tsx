@@ -53,42 +53,39 @@ const PhotoGallery = () => {
         <div className=" sm:columns-2 md:columns-3 columns-1  sm:gap-3 space-y-3 pb-10  ">
           {Array.isArray(Data) && Data.slice(0).reverse().map((item: any,index) => (
             <motion.div
-              initial={{ opacity: 0, y: 20,filter: "blur(10px)" }}
-              animate={{ opacity: 1, y: 0 , filter: "blur(0px)"}}
-              transition={{duration: 0.5} }
+              initial={{ opacity: 0, y: 20, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.5 }}
               key={item._id}
-              className="relative break-inside-avoid w-full h-full group flex justify-center"
+              className="relative break-inside-avoid mb-4 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
             >
-              <Image
-                src={item.image}
-                width={500}
-                height={500}
-                loading="lazy"
-                alt={item.prompt}
-                className="rounded-md z-10 object-contain"
-              />
-
-              <div className="group-hover:opacity-80 opacity-0 justify-between flex-col h-full items-center p-4 absolute z-10 w-full bg-muted bottom-0 flex transition-all ease-in-out duration-200 ">
-                <p
-                  className="font-semibold  text-xl text-clip capitalize cursor-pointer select-none"
-                  onClick={() => copyPrompt(item.prompt)}
-                >
-                  {item.prompt}
-                </p>
-                <div className="flex justify-between w-full py-3 self-baseline">
-                  <Download
-                    className="hover:scale-125 ease-in-out transition-all duration-100"
-                    onClick={() => {
-                      downloadImage(item.image, item.prompt);
-                    }}
-                  />
-                  <p className=" font-semibold capitalize text-md select-none"
+              <div className="relative group">
+                <Image
+                  src={item.image}
+                  width={500}
+                  height={500}
+                  loading="lazy"
+                  alt={item.prompt}
+                  className="w-full h-auto object-cover"
+                />
+                <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between p-4">
+                  <p
+                    className="font-semibold text-white text-lg line-clamp-3 cursor-pointer"
+                    onClick={() => copyPrompt(item.prompt)}
                   >
-                    ~ {item.name}
+                    {item.prompt}
                   </p>
+                  <div className="flex justify-between items-center w-full">
+                    <Download
+                      className="text-white hover:scale-110 transition-transform duration-200 cursor-pointer"
+                      onClick={() => downloadImage(item.image, item.prompt)}
+                    />
+                    <p className="font-semibold text-white text-sm">
+                      ~ {item.name}
+                    </p>
+                  </div>
                 </div>
               </div>
-
             </motion.div>
           ))}
         </div>
