@@ -1,48 +1,53 @@
-export const surpriseMePrompts :string[] = [
-    'an armchair in the shape of an avocado',
-    'a surrealist dream-like oil painting by Salvador Dalí of a cat playing checkers',
-    'teddy bears shopping for groceries in Japan, ukiyo-e',
-    'an oil painting by Matisse of a humanoid robot playing chess',
-    'panda mad scientist mixing sparkling chemicals, digital art',
-    "a macro 35mm photograph of two mice in Hawaii, they're each wearing tiny swimsuits and are carrying tiny surf boards, digital art",
-    '3D render of a cute tropical fish in an aquarium on a dark blue background, digital art',
-    'an astronaut lounging in a tropical resort in space, vaporwave',
-    'an oil painting portrait of a capybara wearing medieval royal robes and an ornate crown on a dark background',
-    'a stained glass window depicting a hamburger and french fries',
-    'a pencil and watercolor drawing of a bright city in the future with flying cars',
-    'a sunlit indoor lounge area with a pool with clear water and another pool with translucent pastel pink water, next to a big window, digital art',
-    'a fortune-telling shiba inu reading your fate in a giant hamburger, digital art',
-    '"a sea otter with a pearl earring" by Johannes Vermeer',
-    'an oil pastel drawing of an annoyed cat in a spaceship',
-    'a painting of a fox in the style of Starry Night',
-    'a bowl of soup that looks like a monster, knitted out of wool',
-    'A plush toy robot sitting against a yellow wall',
-    'A synthwave style sunset above the reflecting water of the sea, digital art',
-    'Two futuristic towers with a skybridge covered in lush foliage, digital art',
-    'A 3D render of a rainbow colored hot air balloon flying above a reflective lake',
-    'A comic book cover of a superhero wearing headphones',
-    'A centered explosion of colorful powder on a black background',
-    'A photo of a Samoyed dog with its tongue out hugging a white Siamese cat',
-    'A photo of a white fur monster standing in a purple room',
-    "A photo of Michelangelo's sculpture of David wearing headphones djing",
-    'A Samurai riding a Horse on Mars, lomography.',
-    'A modern, sleek Cadillac drives along the Gardiner expressway with downtown Toronto in the background, with a lens flare, 50mm photography',
-    'A realistic photograph of a young woman with blue eyes and blonde hair',
-    'A man standing in front of a stargate to another dimension',
-    'Spongebob Squarepants in the Blair Witch Project',
-    'A velociraptor working at a hotdog stand, lomography',
-    'A man walking through the bustling streets of Kowloon at night, lit by many bright neon shop signs, 50mm lens',
-    'A BBQ that is alive, in the style of a Pixar animated movie',
-    'A futuristic cyborg dance club, neon lights',
-    'The long-lost Star Wars 1990 Japanese Anime',
-    'A hamburger in the shape of a Rubik’s cube, professional food photography',
-    'A Synthwave Hedgehog, Blade Runner Cyberpunk',
-    'An astronaut encountering an alien life form on a distant planet, photography',
-    'A Dinosaur exploring Cape Town, photography',
-    'A Man falling in Love with his Computer, digital art',
-    'A photograph of a cyborg exploring Tokyo at night, lomography',
-    'Dracula walking down the street of New York City in the 1920s, black and white photography',
-    'Synthwave aeroplane',
-    'A man wanders through the rainy streets of Tokyo, with bright neon signs, 50mm',
-    'A Space Shuttle flying above Cape Town, digital art',
-  ];
+export const surpriseMePrompts: string[] = [
+  // Surreal & Artistic
+  "a faceless android playing a violin under a moonlit sky, painted in romantic oil brushstrokes",
+  "a humanoid figure made of cracked porcelain with gold seams, floating in a soft white void, digital painting",
+  
+  // Nature & Realistic
+  "a misty sunrise in a Japanese forest, with deer standing quietly near a red torii gate, ultra-realistic photography",
+  "a macro shot of a butterfly with stained-glass wings landing on a dew-covered leaf, 85mm lens",
+  
+  // Sci-Fi & Futuristic
+  "a cyberpunk street food vendor in Neo-Tokyo, glowing signs and fog, Blade Runner aesthetic",
+  "a Martian child playing with a holographic kite on a red desert plain, cinematic concept art",
+  
+  // Cartoon & Whimsical
+  "a group of frogs wearing suits having a tea party in the middle of a lily pond, watercolor illustration",
+  "a flying toaster spaceship with toast astronauts, in the style of a 90s cartoon opening",
+  
+  // Historical & Cultural
+  "a medieval library guarded by mechanical owls, in the style of Renaissance oil painting",
+  "a Mughal warrior riding a tiger across a desert during a sandstorm, dramatic lighting",
+  
+  // Abstract & Conceptual
+  "a human silhouette dissolving into a flock of origami birds, minimalist ink art",
+  "an abstract 3D shape made of clouds, rotating slowly above a mirror-smooth lake",
+  
+  // Fantasy & Mythical
+  "a celestial dragon wrapped around the moon, painted in ancient Chinese ink style",
+  "a village built inside the shell of a giant sleeping turtle, fantasy landscape illustration",
+  
+  // Modern Aesthetic & Design
+  "a cozy reading nook surrounded by indoor plants and warm ambient lighting, Scandinavian interior style",
+  "a retro-futuristic diner on the moon with robots sipping milkshakes, neon colors",
+  
+  // Emotional & Painterly
+  "a lonely child staring out a rainy window at neon city lights, soft brush strokes, digital painting",
+  "a faceless spirit emerging from a puddle at sunset, reflective and moody oil-style artwork",
+  
+  // Photorealistic & Cinematic
+  "a biker speeding through a desert highway at golden hour, wide angle lens shot",
+  "a dramatic black-and-white portrait of an old jazz musician lost in thought, 1950s style photography",
+
+  "a desert nomad riding a mechanical camel through a sandstorm, illustrated in graphic novel style",
+  "a giant whale floating above a city skyline at dusk, dreamy pastel color palette",
+  "a close-up of a human eye reflecting a supernova explosion, ultra-detailed digital painting",
+  "a vintage steam train passing through a forest made entirely of glass trees, surreal art",
+  "a robot barista serving coffee in a quiet Paris café, cozy cinematic lighting",
+  "a medieval knight shaking hands with an alien diplomat under a galactic flag, concept art",
+  "a tropical jungle overrun by glowing bioluminescent plants at night, hyperreal photography",
+  "a slice of cake shaped like a miniature mountain range, food styling photography",
+  "a futuristic underwater city with glowing coral skyscrapers, wide shot, sci-fi concept",
+  "a fox wearing a trench coat solving crimes in a rainy noir city, 2D comic illustration"
+
+];
