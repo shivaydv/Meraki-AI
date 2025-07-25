@@ -23,9 +23,9 @@ const Navigation = () => {
         <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
         <span className="sr-only">Toggle theme</span>
       </Button>
-      <Button size="default" className="" variant="ghost" >
+      {/* <Button size="default" className="" variant="ghost" >
             Login
-        </Button>
+        </Button> */}
     </div>
   );
 };

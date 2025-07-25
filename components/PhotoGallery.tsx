@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import Loader from "./Loader";
 import { toast } from "./ui/use-toast";
 import { Download } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 
 const PhotoGallery = () => {
 
