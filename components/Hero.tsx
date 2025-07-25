@@ -7,13 +7,12 @@ import { motion } from "motion/react";
 
 const Hero = () => (
   <div className="w-full ">
-    {/* <BackgroundGrid color={"#505050"} cellSize={"60px"} /> */}
     <div className="container mx-auto">
       <div className="flex gap-4 py-20 lg:py-40 items-center justify-center flex-col">
         <div>
           <div className="flex items-center justify-center gap-2  border  rounded-full px-4 py-1 bg-background backdrop-blur-md">
             <span
-              className={`inline animate-gradient bg-gradient-to-r from-[#ffaa40] via-[#9c40ff] to-[#ffaa40] bg-[length:var(--bg-size)_100%] bg-clip-text text-transparent`}
+              className={`inline  bg-linear-to-r from-[#ffaa40] via-[#9c40ff] to-[#ffaa40] bg-size-[var(--bg-size)_100%] bg-clip-text text-transparent`}
             >
               Create Your Masterpiece
             </span>
