@@ -151,7 +151,7 @@ const CenterContent = () => {
   );
 };
 
-const BgGradient = () => {
+export const BgGradient = () => {
   const gradientColors = {
     from: "oklch(0.646 0.222 41.116)",
     to: "oklch(0.488 0.243 264.376)",
@@ -162,7 +162,7 @@ const BgGradient = () => {
       {/* Top gradient background */}
       <div
         aria-hidden="true"
-        className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80 min-h-screen"
+        className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80 "
       >
         <div
           style={{
@@ -177,7 +177,7 @@ const BgGradient = () => {
       {/* Bottom gradient background */}
       <div
         aria-hidden="true"
-        className="absolute inset-x-0 top-[calc(100%-13rem)] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[calc(100%-30rem)] min-h-screen"
+        className="absolute inset-x-0 top-[calc(100%-13rem)] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[calc(100%-30rem)] "
       >
         <div
           style={{

@@ -1,26 +1,21 @@
 "use client";
 import axios from "axios";
-import { Button } from "@/components/ui/button";
+import { useState } from "react";
 import { z } from "zod";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
   SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useState, useCallback, useRef } from "react";
-
 import { toast } from "sonner";
 import Image from "next/image";
 import { AspectRatio } from "./ui/aspect-ratio";
-import { Skeleton } from "./ui/skeleton";
-
 import { getRandomPrompt } from "@/lib/utils";
 import Loader from "./Loader";
-
 import FileSaver from "file-saver";
 import { Label } from "./ui/label";
 import { AutosizeTextarea } from "./ui/textarea";
@@ -29,336 +24,300 @@ import React from "react";
 const formSchema = z.object({
   prompt: z
     .string()
-    .min(4, { message: "Prompt must be at least 4 characters" })
-    .max(2000, { message: "Prompt must be at most 2000 characters" }),
+    .min(4, "Prompt must be at least 4 characters")
+    .max(2000, "Prompt must be at most 2000 characters"),
 });
 
-export function InputForm() {
-  const [imageUrl, setImageUrl] = useState<string | undefined>(undefined);
-  // Possible values: 'idle', 'loading', 'sharing', 'uploaded'
-  const [status, setStatus] = useState<"idle" | "loading" | "sharing" | "uploaded">("idle");
-  const [promptData, setPromptData] = useState({
+const aspectRatios = {
+  Square: 1,
+  Vertical: 9 / 16,
+  Landscape: 16 / 9,
+};
+
+export default function InputForm() {
+  const [form, setForm] = useState({
     prompt: "",
     model: "flux",
     size: "Square",
   });
+  const [imageUrl, setImageUrl] = useState<string>();
+  const [status, setStatus] = useState<
+    "idle" | "loading" | "sharing" | "uploaded"
+  >("idle");
   const [promptError, setPromptError] = useState<string | null>(null);
-  // Track the aspect ratio used for the last generated image
-  const [lastGeneratedSize, setLastGeneratedSize] = useState<string>("Square");
-  const isMounted = useRef(true);
+  const [lastSize, setLastSize] = useState("Square");
+  const [lastPrompt, setLastPrompt] = useState("");
 
-  React.useEffect(() => {
-    isMounted.current = true;
-    return () => {
-      isMounted.current = false;
-    };
-  }, []);
+  const isLoading = status === "loading";
+  const isSharing = status === "sharing";
+  const isUploaded = status === "uploaded";
 
-  const handleChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      const { name, value } = e.target;
-      setPromptData((prev) => ({ ...prev, [name]: value }));
-      if (name === "prompt") {
-        try {
-          formSchema.parse({ prompt: value });
-          setPromptError(null);
-        } catch (err: any) {
-          setPromptError(err.errors?.[0]?.message || "Invalid prompt");
-        }
-      }
-    },
-    []
-  );
-
-  const handleModelChange = useCallback((value: string) => {
-    setPromptData((prev) => ({ ...prev, model: value }));
-  }, []);
-
-  const handleSizeChange = useCallback((value: string) => {
-    setPromptData((prev) => ({ ...prev, size: value }));
-  }, []);
-
-  const validatePrompt = useCallback(() => {
+  const validatePrompt = (prompt: string) => {
     try {
-      formSchema.parse({ prompt: promptData.prompt });
+      formSchema.parse({ prompt });
       setPromptError(null);
       return true;
     } catch (err: any) {
       setPromptError(err.errors?.[0]?.message || "Invalid prompt");
       return false;
     }
-  }, [promptData.prompt]);
+  };
 
-  const uploadImage = useCallback(async () => {
-    if (!imageUrl || !promptData.prompt) {
-      toast.error("No image or prompt to share");
-      return;
-    }
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+    if (name === "prompt") validatePrompt(value);
+  };
+
+  const handleSelect = (name: string, value: string) =>
+    setForm((prev) => ({ ...prev, [name]: value }));
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validatePrompt(form.prompt)) return;
+    setStatus("loading");
+    setImageUrl(undefined);
     try {
-      setStatus("sharing");
-      const { prompt } = promptData;
-      const res = await axios.post(`/api/share`, {
-        prompt,
-        image: imageUrl,
+      const res = await fetch("/api/generate", {
+        method: "POST",
+        body: JSON.stringify({ promptData: form }),
+        headers: { "Content-Type": "application/json" },
       });
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      setImageUrl(url);
+      setLastSize(form.size);
+      setLastPrompt(form.prompt); // Save the prompt used for generation
+      setStatus("idle");
+    } catch {
+      toast.error("Something went Wrong");
+      setStatus("idle");
+    }
+  };
+
+  const uploadImage = async () => {
+    if (!imageUrl || !lastPrompt)
+      return toast.error("No image or prompt to share");
+    setStatus("sharing");
+
+    const blob = await fetch(imageUrl).then((r) => r.blob());
+    const formData = new FormData();
+    formData.append("file", blob);
+    formData.append("upload_preset", "meraki-ai");
+
+    try {
+      const uploadRes = await fetch(
+        "https://api.cloudinary.com/v1_1/dvkau07l1/image/upload",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      const uploadData = await uploadRes.json();
+      const uploadedURL = uploadData.secure_url;
+
+      const res = await axios.post(`/api/share`, {
+        prompt: lastPrompt,
+        image: uploadedURL,
+      });
+
       if (res.data.status === 200) {
         toast.success("Image Shared in Community");
-        if (isMounted.current) setStatus("uploaded");
+        setStatus("uploaded");
       } else {
         toast.error("Can't Share in Community");
-        if (isMounted.current) setStatus("idle");
+        setStatus("idle");
       }
-    } catch (error) {
+    } catch {
       toast.error("Something went Wrong");
-      if (isMounted.current) setStatus("idle");
+      setStatus("idle");
     }
-  }, [imageUrl, promptData]);
+  };
 
-  const downloadImage = useCallback(
-    (image: string) => {
-      if (imageUrl && promptData.prompt) {
-        FileSaver.saveAs(image, promptData.prompt);
-        toast.success("Downloading Started");
-      } else {
-        toast.error("Download Failed");
-      }
-    },
-    [imageUrl, promptData.prompt]
-  );
+  const downloadImage = () => {
+    if (imageUrl && form.prompt) {
+      FileSaver.saveAs(imageUrl, form.prompt);
+      toast.success("Downloading Started");
+    } else {
+      toast.error("Download Failed");
+    }
+  };
 
-  const handleSubmit = useCallback(
-    async (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-      if (!validatePrompt()) return;
-      try {
-        setStatus("loading");
-        setImageUrl(undefined);
-        if (isMounted.current) setStatus("loading");
-        const res = await axios.post(`/api/generate`, {
-          promptData,
-        });
-        if (isMounted.current) {
-          setImageUrl(res.data.imageUrl);
-          setLastGeneratedSize(promptData.size); // Set the aspect ratio used for this image
-          setStatus("idle");
-        }
-      } catch (error) {
-        console.log(error);
-        toast.error("Something went Wrong");
-        if (isMounted.current) setStatus("idle");
-      }
-    },
-    [promptData, validatePrompt]
-  );
-
-  const surpriseMe = useCallback(() => {
-    const promptString = getRandomPrompt();
-    setPromptData((prev) => ({ ...prev, prompt: promptString }));
+  const surpriseMe = () => {
+    setForm((prev) => ({ ...prev, prompt: getRandomPrompt() }));
     setPromptError(null);
-  }, []);
+  };
 
-  // Use the aspect ratio for the last generated image, or the current selection if no image
-  const getAspectRatio = useCallback((size: string) => {
-    switch (size) {
-      case "Vertical":
-        return 9 / 16;
-      case "Landscape":
-        return 16 / 9;
-      default:
-        return 1;
-    }
-  }, []);
-
-  // Button enable/disable logic
-  const isLoading = status === "loading";
-  const isSharing = status === "sharing";
-  const isUploaded = status === "uploaded";
-  const isGenerateDisabled = isLoading || isSharing || !promptData.prompt || !!promptError;
-  const isDownloadDisabled = !imageUrl || isLoading;
-  const isShareDisabled = !imageUrl || isSharing || isUploaded || isLoading;
-
-  // Use lastGeneratedSize for the aspect ratio of the displayed image
-  const aspectRatioForImage = imageUrl ? getAspectRatio(lastGeneratedSize) : getAspectRatio(promptData.size);
+  const aspectRatio = imageUrl
+    ? aspectRatios[lastSize as keyof typeof aspectRatios]
+    : aspectRatios[form.size as keyof typeof aspectRatios];
 
   return (
-    <div className="w-full max-w-7xl mx-auto">
-      <div className="flex flex-col md:flex-row gap-8 ">
+    <div className="w-full">
+      <div className="flex flex-col md:flex-row gap-10 justify-between">
         <form
           onSubmit={handleSubmit}
-          className="space-y-6 w-full md:w-1/2 "
+          className="w-full md:w-1/2 space-y-6 p-6 rounded-xl border border-border shadow-sm h-fit"
           autoComplete="off"
-          aria-disabled={isLoading}
         >
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="model">Model</Label>
-                <Select
-                  required
-                  value={promptData.model}
-                  name="model"
-                  onValueChange={handleModelChange}
-                  disabled={isLoading}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select Model" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>Model</SelectLabel>
-                      <SelectItem value="flux">Normal</SelectItem>
-                      <SelectItem value="flux-3d">3D</SelectItem>
-                      <SelectItem value="flux-anime">Anime</SelectItem>
-                      <SelectItem value="flux-realism">Realistic</SelectItem>
-                      <SelectItem value="any-dark">Dark</SelectItem>
-                      <SelectItem value="turbo">Turbo</SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="size">Size</Label>
-                <Select
-                  required
-                  value={promptData.size}
-                  name="size"
-                  onValueChange={handleSizeChange}
-                  disabled={isLoading}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select Size" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>Model</SelectLabel>
-                      <SelectItem value="Square">Square 1:1</SelectItem>
-                      <SelectItem value="Vertical">Vertical 9:16</SelectItem>
-                      <SelectItem value="Landscape">Landscape 16: 9</SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="prompt">Prompt</Label>
-              <AutosizeTextarea
-                id="prompt"
-                placeholder="Enter Your Prompt here..."
-                name="prompt"
-                value={promptData.prompt}
-                onChange={handleChange}
-                required
-                minHeight={10}
-                maxLength={2000}
-                className="w-full resize-none"
-                autoComplete="off"
-                aria-invalid={!!promptError}
-                aria-describedby="prompt-error"
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label className="text-sm font-medium text-muted-foreground">
+                Model
+              </Label>
+              <Select
+                value={form.model}
+                onValueChange={(v) => handleSelect("model", v)}
                 disabled={isLoading}
-              />
-              {promptError && (
-                <p id="prompt-error" className="text-red-500 text-sm">
-                  {promptError}
-                </p>
-              )}
+              >
+                <SelectTrigger className="text-sm rounded-lg border border-border">
+                  <SelectValue placeholder="Select Model" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem value="flux">Normal</SelectItem>
+                    <SelectItem value="kontext">Kontext</SelectItem>
+                    <SelectItem value="turbo">Turbo</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-sm font-medium text-muted-foreground">
+                Size
+              </Label>
+              <Select
+                value={form.size}
+                onValueChange={(v) => handleSelect("size", v)}
+                disabled={isLoading}
+              >
+                <SelectTrigger className="text-sm rounded-lg border border-border">
+                  <SelectValue placeholder="Select Size" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem value="Square">Square</SelectItem>
+                    <SelectItem value="Vertical">Vertical</SelectItem>
+                    <SelectItem value="Landscape">Landscape</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             </div>
           </div>
-
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-muted-foreground">
+              Prompt
+            </Label>
+            <AutosizeTextarea
+              name="prompt"
+              id="prompt"
+              placeholder="Describe your vision..."
+              value={form.prompt}
+              onChange={handleChange}
+              required
+              maxLength={2000}
+              minHeight={10}
+              className="text-sm rounded-lg resize-none"
+              autoCorrect="off"
+              spellCheck="false"
+              disabled={isLoading}
+            />
+            {promptError && (
+              <p className="text-sm text-destructive">{promptError}</p>
+            )}
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={isLoading || isSharing || !form.prompt || !!promptError}
+            >
+              {isLoading ? (
+                <>
+                  <Loader />
+                  <span className="ml-2">Generating</span>
+                </>
+              ) : (
+                "Generate"
+              )}
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              className="w-full border border-border"
+              onClick={surpriseMe}
+              disabled={isLoading}
+            >
+              Surprise Me
+            </Button>
+          </div>
+          {imageUrl && (
+            <div className="grid grid-cols-2 gap-4 pt-2">
               <Button
-                type="submit"
+                onClick={downloadImage}
                 className="w-full"
-                disabled={isGenerateDisabled}
-                aria-disabled={isGenerateDisabled}
-                aria-busy={isLoading}
+                type="button"
+                disabled={isLoading}
               >
-                {isLoading ? (
+                Download
+              </Button>
+              <Button
+                onClick={uploadImage}
+                className="w-full"
+                type="button"
+                disabled={isSharing || isUploaded || isLoading}
+              >
+                {isSharing ? (
                   <>
                     <Loader />
-                    <p className="pl-2">Generating</p>
+                    <span className="ml-2">Sharing</span>
                   </>
+                ) : isUploaded ? (
+                  "Shared"
                 ) : (
-                  "Generate"
+                  "Share in Community"
                 )}
-              </Button>
-              <Button
-                onClick={surpriseMe}
-                type="button"
-                variant="outline"
-                className="w-full"
-                disabled={isLoading}
-                aria-disabled={isLoading}
-              >
-                Surprise Me
               </Button>
             </div>
-            {imageUrl && (
-              <div className="grid grid-cols-2 gap-4">
-                <Button
-                  onClick={() => downloadImage(imageUrl)}
-                  className="w-full"
-                  type="button"
-                  disabled={isDownloadDisabled}
-                  aria-disabled={isDownloadDisabled}
-                >
-                  Download
-                </Button>
-                <Button
-                  onClick={uploadImage}
-                  className="w-full"
-                  type="button"
-                  disabled={isShareDisabled}
-                  aria-disabled={isShareDisabled}
-                >
-                  {isSharing ? (
-                    <>
-                      <Loader />
-                      <p className="pl-2">Sharing</p>
-                    </>
-                  ) : isUploaded ? (
-                    "Shared"
-                  ) : (
-                    "Share in Community"
-                  )}
-                </Button>
-              </div>
-            )}
-          </div>
+          )}
         </form>
-
-        <div
-          className={`w-full mx-auto md:w-1/2  ${
-            lastGeneratedSize == "Vertical" ? "max-w-sm" : "max-w-md"
-          }`}
-        >
-          <AspectRatio ratio={aspectRatioForImage}>
-            {imageUrl ? (
-              <Image
-                src={`${imageUrl}`}
-                loading="lazy"
-                fill
-                className="rounded-lg object-cover shadow-lg"
-                alt="AI Generated Image"
-              />
-            ) : (
-              <div className="w-full h-full flex justify-center items-center bg-primary-foreground border-2 rounded-lg flex-col gap-2">
-                {isLoading ? (
-                  <Skeleton className="w-full h-full bg-primary/10 border-2">
+        <div className="w-full md:w-1/2 flex flex-col items-center justify-center">
+          <div
+            className={`w-full flex justify-center items-center ${
+              (imageUrl ? lastSize : form.size) === "Vertical"
+                ? "max-w-xs"
+                : (imageUrl ? lastSize : form.size) === "Landscape"
+                ? "max-w-xl"
+                : "max-w-md"
+            }`}
+          >
+            <AspectRatio ratio={aspectRatio}>
+              {imageUrl ? (
+                <Image
+                  src={imageUrl}
+                  loading="lazy"
+                  fill
+                  className="rounded-xl border border-border shadow-lg object-cover"
+                  alt="AI Generated Image"
+                />
+              ) : (
+                <div className="w-full h-full bg-muted flex items-center justify-center rounded-xl border text-muted-foreground">
+                  {isLoading ? (
                     <Loader />
-                  </Skeleton>
-                ) : (
-                  <p className="text-gray-500">No Image is Generated Yet</p>
-                )}
-              </div>
-            )}
-          </AspectRatio>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      Image not generated yet
+                    </p>
+                  )}
+                </div>
+              )}
+            </AspectRatio>
+          </div>
         </div>
       </div>
     </div>
   );
 }
-
-export default InputForm;

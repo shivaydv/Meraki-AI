@@ -17,7 +17,7 @@ export async function POST(req: Request, res: Response) {
     await connect();
     const { name, prompt, image } = await req.json();
     const photoUrl = await cloudinary.uploader.upload(image);
-    const newPost = await Post.create({
+     await Post.create({
       name,
       prompt,
       image: photoUrl.url,

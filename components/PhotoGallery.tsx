@@ -8,8 +8,15 @@ import Loader from "./Loader";
 import { toast } from "sonner";
 import { Download } from "lucide-react";
 import { motion } from "motion/react";
+import Masonry from "react-masonry-css";
 
 const PhotoGallery = () => {
+  const breakpointColumnsObj = {
+    default: 3,
+    768: 2,
+    500: 1,
+  };
+
   const [Data, setData] = useState<any[]>([]);
   const [Error, setError] = useState<boolean>(false);
   const [Loading, setLoading] = useState<boolean>(true);
@@ -47,48 +54,47 @@ const PhotoGallery = () => {
           <Loader />
         </div>
       ) : (
-        <div className=" sm:columns-2 md:columns-3 columns-1  sm:gap-3 space-y-3 pb-10  ">
-          {Array.isArray(Data) &&
-            Data.slice(0)
-              .reverse()
-              .map((item: any, index) => (
-                <motion.div
-                  initial={{ opacity: 0, y: 20, scale: 0.9 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  transition={{ duration: 0.5 }}
-                  key={item._id}
-                  className="relative break-inside-avoid mb-4 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
+        <Masonry
+          breakpointCols={breakpointColumnsObj}
+          className="flex w-auto gap-4"
+          columnClassName="my-masonry-column"
+        >
+          {Data?.map((item: any) => (
+            <motion.div
+              initial={{ opacity: 0, y: 20, scale: 0.9}}
+              animate={{ opacity: 1, y: 0, scale: 1}}
+              transition={{ duration: 0.5 ,ease: "easeIn"}}
+              key={item._id}
+              className="mb-4 group break-inside-avoid rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 relative"
+            >
+              <Image
+                src={item.image}
+                width={500}
+                height={500}
+                alt={item.prompt}
+                className="w-full h-auto object-cover"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between p-4">
+                <p
+                  className="font-semibold text-white text-lg line-clamp-3 cursor-pointer"
+                  onClick={() => copyPrompt(item.prompt)}
                 >
-                  <div className="relative group">
-                    <Image
-                      src={item.image}
-                      width={500}
-                      height={500}
-                      loading="lazy"
-                      alt={item.prompt}
-                      className="w-full h-auto object-cover"
-                    />
-                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between p-4">
-                      <p
-                        className="font-semibold text-white text-lg line-clamp-3 cursor-pointer"
-                        onClick={() => copyPrompt(item.prompt)}
-                      >
-                        {item.prompt}
-                      </p>
-                      <div className="flex justify-between items-center w-full">
-                        <Download
-                          className="text-white hover:scale-110 transition-transform duration-200 cursor-pointer"
-                          onClick={() => downloadImage(item.image, item.prompt)}
-                        />
-                        <p className="font-semibold text-white text-sm">
-                          ~ {item.name}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-        </div>
+                  {item.prompt}
+                </p>
+                <div className="flex justify-between items-center w-full">
+                  <Download
+                    className="text-white hover:scale-110 transition-transform duration-200 cursor-pointer"
+                    onClick={() => downloadImage(item.image, item.prompt)}
+                  />
+                  <p className="font-semibold text-white text-sm">
+                    ~ {item.name}
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </Masonry>
       )}
       {Error && (
         <div className="flex h-48 justify-center items-center">
