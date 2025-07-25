@@ -11,10 +11,6 @@ export const surpriseMePrompts: string[] = [
   "a cyberpunk street food vendor in Neo-Tokyo, glowing signs and fog, Blade Runner aesthetic",
   "a Martian child playing with a holographic kite on a red desert plain, cinematic concept art",
   
-  // Cartoon & Whimsical
-  "a group of frogs wearing suits having a tea party in the middle of a lily pond, watercolor illustration",
-  "a flying toaster spaceship with toast astronauts, in the style of a 90s cartoon opening",
-  
   // Historical & Cultural
   "a medieval library guarded by mechanical owls, in the style of Renaissance oil painting",
   "a Mughal warrior riding a tiger across a desert during a sandstorm, dramatic lighting",

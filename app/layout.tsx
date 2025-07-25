@@ -1,19 +1,13 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import localFont from "next/font/local";
-import Navbar from "@/components/Navbar";
-import { Toaster } from "@/components/ui/toaster";
+import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Geist } from "next/font/google";
 
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
+const geistSans = Geist({
   variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+  subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
@@ -28,34 +22,6 @@ export const metadata: Metadata = {
     "image creation",
     "AI models",
   ],
-  openGraph: {
-    type: "website",
-    url: "https://meraki-ai.vercel.app",
-    title: "Meraki Ai",
-    description:
-      "Meraki Ai is a platform that generates images based on text prompts using AI.",
-    images: [
-      {
-        url: "./OpenGraph.png",
-        width: 800,
-        height: 600,
-        alt: "Meraki Ai",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    site: "@meraki_ai",
-    title: "Meraki Ai",
-    description:
-      "Meraki Ai is a platform that generates images based on text prompts using AI.",
-    images: {
-      url: "./twitter.png",
-      width: 1200,
-      height: 630,
-      alt: "Meraki Ai",
-    },
-  },
 };
 
 export default function RootLayout({
@@ -66,16 +32,12 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.className} antialiased`}
         suppressHydrationWarning
       >
         <ThemeProvider attribute="class" defaultTheme="dark">
-          <main className=" flex flex-col min-h-screen mx-auto  relative">
-            <Navbar />
-            <div className="flex-1 flex container mx-auto w-full px-4 pt-2.5">
-              {children}
-            </div>
-          </main>
+          {children}
+
           <Toaster />
         </ThemeProvider>
       </body>

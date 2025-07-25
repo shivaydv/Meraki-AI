@@ -11,10 +11,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useState, useCallback, useRef } from "react";
 
-import { toast } from "./ui/use-toast";
+import { toast } from "sonner";
 import Image from "next/image";
 import { AspectRatio } from "./ui/aspect-ratio";
 import { Skeleton } from "./ui/skeleton";
@@ -24,111 +23,142 @@ import Loader from "./Loader";
 
 import FileSaver from "file-saver";
 import { Label } from "./ui/label";
+import { AutosizeTextarea } from "./ui/textarea";
+import React from "react";
 
 const formSchema = z.object({
   prompt: z
     .string()
-    .min(4, { message: "Prompt must be at least 4 characters" }),
+    .min(4, { message: "Prompt must be at least 4 characters" })
+    .max(2000, { message: "Prompt must be at most 2000 characters" }),
 });
 
 export function InputForm() {
   const [imageUrl, setImageUrl] = useState<string | undefined>(undefined);
-  const [Loading, setLoading] = useState<boolean>(false);
-  const [Sharing, setSharing] = useState<boolean>(false);
-  const [Uploaded, setUploaded] = useState<boolean>(false);
-  const [promptData, setpromptData] = useState({
+  // Possible values: 'idle', 'loading', 'sharing', 'uploaded'
+  const [status, setStatus] = useState<"idle" | "loading" | "sharing" | "uploaded">("idle");
+  const [promptData, setPromptData] = useState({
     prompt: "",
     model: "flux",
     size: "Square",
   });
+  const [promptError, setPromptError] = useState<string | null>(null);
+  // Track the aspect ratio used for the last generated image
+  const [lastGeneratedSize, setLastGeneratedSize] = useState<string>("Square");
+  const isMounted = useRef(true);
 
-  const handleChange = (e: any) => {
-    const { name, value } = e.target;
-    setpromptData({ ...promptData, [name]: value });
-  };
+  React.useEffect(() => {
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
 
-  async function uploadImage() {
+  const handleChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      const { name, value } = e.target;
+      setPromptData((prev) => ({ ...prev, [name]: value }));
+      if (name === "prompt") {
+        try {
+          formSchema.parse({ prompt: value });
+          setPromptError(null);
+        } catch (err: any) {
+          setPromptError(err.errors?.[0]?.message || "Invalid prompt");
+        }
+      }
+    },
+    []
+  );
+
+  const handleModelChange = useCallback((value: string) => {
+    setPromptData((prev) => ({ ...prev, model: value }));
+  }, []);
+
+  const handleSizeChange = useCallback((value: string) => {
+    setPromptData((prev) => ({ ...prev, size: value }));
+  }, []);
+
+  const validatePrompt = useCallback(() => {
     try {
-      setSharing(true);
+      formSchema.parse({ prompt: promptData.prompt });
+      setPromptError(null);
+      return true;
+    } catch (err: any) {
+      setPromptError(err.errors?.[0]?.message || "Invalid prompt");
+      return false;
+    }
+  }, [promptData.prompt]);
+
+  const uploadImage = useCallback(async () => {
+    if (!imageUrl || !promptData.prompt) {
+      toast.error("No image or prompt to share");
+      return;
+    }
+    try {
+      setStatus("sharing");
       const { prompt } = promptData;
       const res = await axios.post(`/api/share`, {
         prompt,
         image: imageUrl,
       });
-      if (res.data.status == 200) {
-        toast({
-          title: "Message",
-          description: "Shared Successfully!",
-          className: "bg-green-600 text-white",
-        });
-        setUploaded(true);
+      if (res.data.status === 200) {
+        toast.success("Image Shared in Community");
+        if (isMounted.current) setStatus("uploaded");
       } else {
-        toast({
-          title: "Error",
-          description: "Can't Share in Community",
-          variant: "destructive",
-        });
+        toast.error("Can't Share in Community");
+        if (isMounted.current) setStatus("idle");
       }
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Something went Wrong",
-        variant: "destructive",
-      });
-    } finally {
-      setSharing(false);
+      toast.error("Something went Wrong");
+      if (isMounted.current) setStatus("idle");
     }
-  }
+  }, [imageUrl, promptData]);
 
-  const downloadImage = (image: string) => {
-    if (imageUrl) {
-      const { prompt } = promptData;
-      FileSaver.saveAs(image, prompt);
-      toast({
-        title: "Message",
-        description: "Downloading Started",
-        className: "bg-green-600 text-white",
-      });
-    } else {
-      toast({
-        title: "Error",
-        description: "Download Failed",
-        variant: "destructive",
-      });
-    }
-  };
+  const downloadImage = useCallback(
+    (image: string) => {
+      if (imageUrl && promptData.prompt) {
+        FileSaver.saveAs(image, promptData.prompt);
+        toast.success("Downloading Started");
+      } else {
+        toast.error("Download Failed");
+      }
+    },
+    [imageUrl, promptData.prompt]
+  );
 
-  async function handleSubmit(e: any) {
-    e.preventDefault();
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      if (!validatePrompt()) return;
+      try {
+        setStatus("loading");
+        setImageUrl(undefined);
+        if (isMounted.current) setStatus("loading");
+        const res = await axios.post(`/api/generate`, {
+          promptData,
+        });
+        if (isMounted.current) {
+          setImageUrl(res.data.imageUrl);
+          setLastGeneratedSize(promptData.size); // Set the aspect ratio used for this image
+          setStatus("idle");
+        }
+      } catch (error) {
+        console.log(error);
+        toast.error("Something went Wrong");
+        if (isMounted.current) setStatus("idle");
+      }
+    },
+    [promptData, validatePrompt]
+  );
 
-    try {
-      setLoading(true);
-      setImageUrl(undefined);
-      setUploaded(false);
-      const res = await axios.post(`/api/generate`, {
-        promptData,
-      });
-      setImageUrl(res.data.imageUrl);
-      // setpromptData({ ...promptData, prompt: "" });
-    } catch (error) {
-      console.log(error);
-      toast({
-        title: "Error",
-        description: "Something went Wrong",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  const surpriseMe = () => {
+  const surpriseMe = useCallback(() => {
     const promptString = getRandomPrompt();
-    setpromptData({ ...promptData, prompt: promptString });
-  };
+    setPromptData((prev) => ({ ...prev, prompt: promptString }));
+    setPromptError(null);
+  }, []);
 
-  // Add this function to determine the aspect ratio
-  const getAspectRatio = (size: string) => {
+  // Use the aspect ratio for the last generated image, or the current selection if no image
+  const getAspectRatio = useCallback((size: string) => {
     switch (size) {
       case "Vertical":
         return 9 / 16;
@@ -137,8 +167,18 @@ export function InputForm() {
       default:
         return 1;
     }
-  };
+  }, []);
 
+  // Button enable/disable logic
+  const isLoading = status === "loading";
+  const isSharing = status === "sharing";
+  const isUploaded = status === "uploaded";
+  const isGenerateDisabled = isLoading || isSharing || !promptData.prompt || !!promptError;
+  const isDownloadDisabled = !imageUrl || isLoading;
+  const isShareDisabled = !imageUrl || isSharing || isUploaded || isLoading;
+
+  // Use lastGeneratedSize for the aspect ratio of the displayed image
+  const aspectRatioForImage = imageUrl ? getAspectRatio(lastGeneratedSize) : getAspectRatio(promptData.size);
 
   return (
     <div className="w-full max-w-7xl mx-auto">
@@ -146,6 +186,8 @@ export function InputForm() {
         <form
           onSubmit={handleSubmit}
           className="space-y-6 w-full md:w-1/2 "
+          autoComplete="off"
+          aria-disabled={isLoading}
         >
           <div className="space-y-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -155,9 +197,8 @@ export function InputForm() {
                   required
                   value={promptData.model}
                   name="model"
-                  onValueChange={(e) =>
-                    setpromptData({ ...promptData, model: e })
-                  }
+                  onValueChange={handleModelChange}
+                  disabled={isLoading}
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select Model" />
@@ -182,9 +223,8 @@ export function InputForm() {
                   required
                   value={promptData.size}
                   name="size"
-                  onValueChange={(e) =>
-                    setpromptData({ ...promptData, size: e })
-                  }
+                  onValueChange={handleSizeChange}
+                  disabled={isLoading}
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select Size" />
@@ -203,23 +243,39 @@ export function InputForm() {
 
             <div className="space-y-2">
               <Label htmlFor="prompt">Prompt</Label>
-              <Input
+              <AutosizeTextarea
                 id="prompt"
                 placeholder="Enter Your Prompt here..."
                 name="prompt"
                 value={promptData.prompt}
                 onChange={handleChange}
                 required
-                className="resize-none w-full"
+                minHeight={10}
+                maxLength={2000}
+                className="w-full resize-none"
                 autoComplete="off"
+                aria-invalid={!!promptError}
+                aria-describedby="prompt-error"
+                disabled={isLoading}
               />
+              {promptError && (
+                <p id="prompt-error" className="text-red-500 text-sm">
+                  {promptError}
+                </p>
+              )}
             </div>
           </div>
 
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
-              <Button type="submit" className="w-full" disabled={Loading}>
-                {Loading ? (
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={isGenerateDisabled}
+                aria-disabled={isGenerateDisabled}
+                aria-busy={isLoading}
+              >
+                {isLoading ? (
                   <>
                     <Loader />
                     <p className="pl-2">Generating</p>
@@ -233,6 +289,8 @@ export function InputForm() {
                 type="button"
                 variant="outline"
                 className="w-full"
+                disabled={isLoading}
+                aria-disabled={isLoading}
               >
                 Surprise Me
               </Button>
@@ -243,6 +301,8 @@ export function InputForm() {
                   onClick={() => downloadImage(imageUrl)}
                   className="w-full"
                   type="button"
+                  disabled={isDownloadDisabled}
+                  aria-disabled={isDownloadDisabled}
                 >
                   Download
                 </Button>
@@ -250,13 +310,16 @@ export function InputForm() {
                   onClick={uploadImage}
                   className="w-full"
                   type="button"
-                  disabled={Sharing || Uploaded}
+                  disabled={isShareDisabled}
+                  aria-disabled={isShareDisabled}
                 >
-                  {Sharing ? (
+                  {isSharing ? (
                     <>
                       <Loader />
                       <p className="pl-2">Sharing</p>
                     </>
+                  ) : isUploaded ? (
+                    "Shared"
                   ) : (
                     "Share in Community"
                   )}
@@ -266,9 +329,12 @@ export function InputForm() {
           </div>
         </form>
 
-
-        <div className={`w-full mx-auto md:w-1/2  ${promptData.size == "Vertical"? "max-w-sm":"max-w-md" }`}>
-          <AspectRatio ratio={getAspectRatio(promptData.size)}>
+        <div
+          className={`w-full mx-auto md:w-1/2  ${
+            lastGeneratedSize == "Vertical" ? "max-w-sm" : "max-w-md"
+          }`}
+        >
+          <AspectRatio ratio={aspectRatioForImage}>
             {imageUrl ? (
               <Image
                 src={`${imageUrl}`}
@@ -279,7 +345,7 @@ export function InputForm() {
               />
             ) : (
               <div className="w-full h-full flex justify-center items-center bg-primary-foreground border-2 rounded-lg flex-col gap-2">
-                {Loading ? (
+                {isLoading ? (
                   <Skeleton className="w-full h-full bg-primary/10 border-2">
                     <Loader />
                   </Skeleton>

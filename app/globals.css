@@ -5,6 +5,9 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
+  --font-giest: var(--font-giest-sans);
+  --font-giest-mono: var(--font-giest-mono);
+
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
