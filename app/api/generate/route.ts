@@ -40,7 +40,7 @@ export async function POST(req: Request) {
     const contentDisposition =
       imageRes.headers.get("content-disposition") || "inline";
 
-      
+
     return new Response(imageRes.body, {
       status: 200,
       headers: {

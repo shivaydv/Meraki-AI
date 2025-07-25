@@ -151,7 +151,7 @@ const CenterContent = () => {
   );
 };
 
-export const BgGradient = () => {
+const BgGradient = () => {
   const gradientColors = {
     from: "oklch(0.646 0.222 41.116)",
     to: "oklch(0.488 0.243 264.376)",

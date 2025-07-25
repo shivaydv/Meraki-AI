@@ -12,7 +12,7 @@ cloudinary.config({
 
 
 
-export async function POST(req: Request, res: Response) {
+export async function POST(req: Request) {
   try {
     await connect();
     const { name, prompt, image } = await req.json();
