@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-export const maxDuration = 100; // 100 seconds
+export const maxDuration = 60; 
 
 const sizeMap: Record<string, { width: number; height: number }> = {
   Square: { width: 1080, height: 1080 },
