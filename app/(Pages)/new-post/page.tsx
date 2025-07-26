@@ -3,7 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 
-const page = () => {
+const page = async() => {
+
   return (
     <main className="w-full flex flex-col py-6 gap-8 mb-4">
       <div className="flex justify-between items-center max-md:flex-col max-md:items-start gap-2">

@@ -85,6 +85,14 @@ export default function InputForm() {
         body: JSON.stringify({ promptData: form }),
         headers: { "Content-Type": "application/json" },
       });
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error("Image generation failed:", errorText);
+        toast.error("Failed to generate image");
+        setStatus("idle");
+        return;
+      }
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       setImageUrl(url);
@@ -178,8 +186,7 @@ export default function InputForm() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    <SelectItem value="flux">Normal</SelectItem>
-                    <SelectItem value="kontext">Kontext</SelectItem>
+                    <SelectItem value="flux">Flux</SelectItem>
                     <SelectItem value="turbo">Turbo</SelectItem>
                   </SelectGroup>
                 </SelectContent>
