@@ -59,7 +59,7 @@ const FloatingImages = () => {
         <motion.img
           src={images[6]}
           initial={{ opacity: 0 }}
-          className="w-20 h-16 sm:w-24 sm:h-16 md:w-28 md:h-20 lg:w-32 lg:h-24 object-cover hover:scale-105 duration-200 cursor-pointer transition-transform -rotate-[3deg] shadow-2xl rounded-xl"
+          className="w-20 h-16 sm:w-24 sm:h-16 md:w-28 md:h-20 lg:w-32 lg:h-24 object-cover hover:scale-105 duration-200  transition-transform -rotate-[3deg] shadow-2xl rounded-xl"
         />
       </FloatingElement>
       <FloatingElement
@@ -69,7 +69,7 @@ const FloatingImages = () => {
         <motion.img
           src={images[1]}
           initial={{ opacity: 0 }}
-          className="w-40 h-28 sm:w-48 sm:h-36 md:w-56 md:h-44 lg:w-60 lg:h-48 object-cover hover:scale-105 duration-200 cursor-pointer transition-transform -rotate-12 shadow-2xl rounded-xl"
+          className="w-40 h-28 sm:w-48 sm:h-36 md:w-56 md:h-44 lg:w-60 lg:h-48 object-cover hover:scale-105 duration-200  transition-transform -rotate-12 shadow-2xl rounded-xl"
         />
       </FloatingElement>
 
@@ -80,7 +80,7 @@ const FloatingImages = () => {
         <motion.img
           src={images[2]}
           initial={{ opacity: 0 }}
-          className="w-40 h-40 sm:w-48 sm:h-48 md:w-60 md:h-60 lg:w-64 lg:h-64 object-cover -rotate-[4deg] hover:scale-105 duration-200 cursor-pointer transition-transform shadow-2xl rounded-xl"
+          className="w-40 h-40 sm:w-48 sm:h-48 md:w-60 md:h-60 lg:w-64 lg:h-64 object-cover -rotate-[4deg] hover:scale-105 duration-200  transition-transform shadow-2xl rounded-xl"
         />
       </FloatingElement>
       <FloatingElement
@@ -90,7 +90,7 @@ const FloatingImages = () => {
         <motion.img
           src={images[3]}
           initial={{ opacity: 0 }}
-          className="w-32 h-32 sm:w-48 sm:h-44 md:w-60 md:h-52 lg:w-64 lg:h-56 object-cover hover:scale-105 duration-200 cursor-pointer transition-transform shadow-2xl rotate-[10deg] rounded-xl"
+          className="w-32 h-32 sm:w-48 sm:h-44 md:w-60 md:h-52 lg:w-64 lg:h-56 object-cover hover:scale-105 duration-200  transition-transform shadow-2xl rotate-[10deg] rounded-xl"
         />
       </FloatingElement>
       <FloatingElement
@@ -100,7 +100,7 @@ const FloatingImages = () => {
         <motion.img
           src={images[4]}
           initial={{ opacity: 0 }}
-          className="w-60 h-44 sm:w-72 sm:h-64 md:w-80 md:h-72 lg:w-96 lg:h-80 object-cover hover:scale-105 duration-200 cursor-pointer transition-transform shadow-2xl rotate-[19deg] rounded-xl"
+          className="w-60 h-44 sm:w-72 sm:h-64 md:w-80 md:h-72 lg:w-96 lg:h-80 object-cover hover:scale-105 duration-200  transition-transform shadow-2xl rotate-[19deg] rounded-xl"
         />
       </FloatingElement>
     </Floating>

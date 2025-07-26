@@ -15,12 +15,7 @@ export const metadata: Metadata = {
   description:
     "Meraki Ai is a platform that generates images based on text prompts using AI. It is a simple and easy-to-use tool that allows you to create images for your projects, presentations, and social media posts. Just enter a text prompt, select a model, and choose the size of the image you want to generate. Meraki Ai will generate an image based on your input and provide you with a high-quality image that you can download and use in your projects. With 5+ Models to choose from, you can create a wide variety of images for different purposes. Try Meraki Ai today and see how easy it is to generate images with AI.",
   keywords: [
-    "AI image generation",
-    "text to image",
-    "Meraki Ai",
-    "AI tools",
-    "image creation",
-    "AI models",
+    "AI image generation","text to image","Meraki Ai","AI tools","image creation","AI models","Shiva Yadav","Shiva Yadav portfolio","Shiva Yadav developer","axiomite ui","dev axioms",
   ],
 };
 

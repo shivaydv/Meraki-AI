@@ -2,13 +2,24 @@
 
 import { Button } from "./ui/button";
 import { useTheme } from "next-themes";
-import { Moon, Sun } from "lucide-react";
+import { Github, Moon, Sun, TwitterIcon } from "lucide-react";
+import Link from "next/link";
 
 const Navigation = () => {
   const { theme, setTheme } = useTheme();
 
   return (
-    <div className="justify-center items-center flex gap-3 ">
+    <div className="justify-center items-center flex gap-2 ">
+      <Link href="https://x.com/Shivay1256" target="_blank" rel="noopener noreferrer">
+        <Button size="icon" variant="ghost">
+          <TwitterIcon className="h-[1.2rem] w-[1.2rem] " />
+        </Button>
+      </Link>
+      <Link href="https://github.com/shivaydv/meraki-ai" target="_blank" rel="noopener noreferrer">
+        <Button size="icon" variant="ghost">
+          <Github className="h-[1.2rem] w-[1.2rem] " />
+        </Button>
+      </Link>
       <Button
         size="sm"
         onClick={() =>
